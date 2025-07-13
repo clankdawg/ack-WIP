@@ -4,7 +4,7 @@ SFLAGS = -f elf32
 all: clean kernel boot image
 
 clean:
-	rm -rf *.o && rm -rf kernel.iso && rm -rf src/boot/kernel
+	rm -rf *.o && rm -rf kernel.iso && rm -rf src/boot/kernel && rm -rf src/interrupts/*.o
 
 kernel:
 	gcc $(CFLAGS) -c src/kernel.c -o src/kernel.o
