@@ -1,5 +1,5 @@
-#include "stdint.h"
-#include "util.h"
+#include "../stdint/stdint.h"
+#include "../vga_utils/util.h"
 
 struct gdt_entry_struct{
 	uint16_t limit;

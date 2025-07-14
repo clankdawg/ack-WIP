@@ -1,6 +1,6 @@
-#include "../stdint.h"
-#include "../util.h"
-#include "../vga.h"
+#include "../stdint/stdint.h"
+#include "../vga_utils/util.h"
+#include "../vga_utils/vga.h"
 #include "idt.h"
 
 struct idt_entry_struct idt_entries[256];
@@ -133,7 +133,8 @@ void isr_handler(struct InterruptRegisters* regs){
 }
 
 void *irq_routines[16] = {
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0
 };
 
 void irq_install_handler (int irq, void (*handler)(struct InterruptRegisters *r)){

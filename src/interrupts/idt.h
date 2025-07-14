@@ -1,4 +1,4 @@
-#include "../stdint.h"
+#include "../stdint/stdint.h"
 
 struct idt_entry_struct{
     uint16_t base_low;
@@ -17,6 +17,8 @@ void initIdt();
 void setIdtGate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
 
 void isr_handlers(struct InterruptRegisters* regs);
+
+void irq_install_handler (int irq, void (*handler)(struct InterruptRegisters *r));
 
 extern void isr0();
 extern void isr1();
