@@ -1,0 +1,8 @@
+Cross Compiler:
+    You need the i686-elf-gcc cross compiler, it must be installed at /usr/opt/cross unless specified otherwise in the makefile.
+
+Assembly:
+    NASM is required.
+    
+GRUB:
+    Check if grub-mkrescue is installed on your system by passing it without any arguments, check for xorriso too.
