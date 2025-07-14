@@ -5,7 +5,7 @@ SFLAGS = -f elf32
 all: clean kernel boot image
 
 clean:
-	rm -rf /src/*/*.o && rm -rf kernel.iso && rm -rf src/boot/kernel && rm -rf src/*/*.o && rm -rf qemulog.log
+	rm -rf /src/*/*.o && rm -rf kernel.iso && rm -rf kernelusb.iso && rm -rf src/boot/kernel && rm -rf src/boot/kernel.efi && rm -rf src/boot/kernel && rm -rf src/*/*.o && rm -rf qemulog.log
 
 kernel:
 	$(gcc) $(CFLAGS) -c src/kernel/kernel.c -o src/kernel/kernel.o
@@ -34,3 +34,9 @@ qemu-debug:
 qemu-debug-gdb:
 	chmod +x helper.sh
 	./helper.sh
+
+iso-usb: kernel boot
+	ld -m elf_i386 -T linker.ld -o kernel src/kernel/boot.o src/kernel/kernel.o src/vga_utils/vga.o src/gdt/gdt.o src/gdt/gdts.o src/vga_utils/util.o src/interrupts/idt.o src/interrupts/idts.o src/timer/timer.o
+	mv kernel src/boot/kernel
+	grub-mkrescue -o kernelusb.iso src/
+	rm src/*/*.o
