@@ -4,6 +4,7 @@ ack is an OS project that i made as a hobby OS. It is not intended to be a daily
 
 Line count (Updated every commit **ENABLE WORD WRAP**):
 
+github.com/AlDanial/cloc v 1.98  T=0.02 s (1071.5 files/s, 45514.8 lines/s)
 Language                files       blank       comment     code
 
 C                             6           47          5      333
