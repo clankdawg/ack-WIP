@@ -5,8 +5,8 @@
 
 void kmain(void);
 
-
-void kmain(void){
+void kmain(void)
+{
 	Reset();
 	initGdt();
 	print("GDT initialized.\r\n");
@@ -17,7 +17,8 @@ void kmain(void){
 
 	__asm__ volatile("sti");
 
-	for(;;){
+	for (;;)
+	{
 		__asm__ volatile("hlt");
 	}
 }
