@@ -1,4 +1,5 @@
 #include "gdt.h"
+#include "../vga_utils/util.h"
 
 // For extra information see wiki.osdev.org/Global_Descriptor_Table
 

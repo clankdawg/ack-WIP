@@ -14,13 +14,14 @@ kernel:
 	$(gcc) $(CFLAGS) -c src/vga_utils/util.c -o src/vga_utils/util.o
 	$(gcc) $(CFLAGS) -c src/interrupts/idt.c -o src/interrupts/idt.o
 	$(gcc) $(CFLAGS) -c src/timer/timer.c -o src/timer/timer.o
+	$(gcc) $(CFLAGS) -c src/keyboard/keyboard.c -o src/keyboard/keyboard.o
 boot:
 	nasm $(SFLAGS) src/kernel/boot.s -o src/kernel/boot.o
 	nasm $(SFLAGS) src/gdt/gdt.s -o src/gdt/gdts.o
 	nasm $(SFLAGS) src/interrupts/idt.s -o src/interrupts/idts.o
 
 image:
-	ld -m elf_i386 -T linker.ld -o kernel src/kernel/boot.o src/kernel/kernel.o src/vga_utils/vga.o src/gdt/gdt.o src/gdt/gdts.o src/vga_utils/util.o src/interrupts/idt.o src/interrupts/idts.o src/timer/timer.o
+	ld -m elf_i386 -T linker.ld -o kernel src/kernel/boot.o src/kernel/kernel.o src/vga_utils/vga.o src/gdt/gdt.o src/gdt/gdts.o src/vga_utils/util.o src/interrupts/idt.o src/interrupts/idts.o src/timer/timer.o src/keyboard/keyboard.o
 	mv kernel src/boot/kernel
 	grub-mkrescue -o kernel.iso src/
 	rm src/*/*.o
@@ -35,8 +36,7 @@ qemu-debug-gdb:
 	chmod +x helper.sh
 	./helper.sh
 
-iso-usb: kernel boot
-	ld -m elf_i386 -T linker.ld -o kernel src/kernel/boot.o src/kernel/kernel.o src/vga_utils/vga.o src/gdt/gdt.o src/gdt/gdts.o src/vga_utils/util.o src/interrupts/idt.o src/interrupts/idts.o src/timer/timer.o
+iso-usb: kernel boot image
 	mv kernel src/boot/kernel
 	grub-mkrescue -o kernelusb.iso src/
 	rm src/*/*.o

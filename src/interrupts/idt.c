@@ -2,6 +2,7 @@
 #include "../vga_utils/util.h"
 #include "../vga_utils/vga.h"
 #include "idt.h"
+#include "../keyboard/keyboard.h"
 
 struct idt_entry_struct idt_entries[256];
 struct idt_ptr_struct idt_ptr;
@@ -90,7 +91,7 @@ void setIdtGate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)
     idt_entries[num].flags = flags | 0x60;
 }
 
-unsigned char *exception_messages[] = {
+const char *exception_messages[] = {
     "Division By Zero",
     "Debug",
     "Non Maskable Interrupt",
@@ -124,7 +125,7 @@ unsigned char *exception_messages[] = {
     "Reserved",
     "Reserved"};
 
-void isr_handler(struct InterruptRegisters *regs)
+void isr_handlers(struct InterruptRegisters *regs)
 {
     if (regs->int_no < 32)
     {
@@ -140,7 +141,7 @@ void *irq_routines[16] = {
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0};
 
-void irq_install_handler(int irq, void (*handler)(struct InterruptRegisters *r))
+void irq_install_handler(int irq, void (*handler)(struct InterruptRegisters *regs))
 {
     irq_routines[irq] = handler;
 }
