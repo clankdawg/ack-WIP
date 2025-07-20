@@ -1,4 +1,5 @@
 #include "../stdint/stdint.h"
+#include "../vga_utils/util.h"
 
 struct idt_entry_struct
 {

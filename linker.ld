@@ -1,4 +1,4 @@
-ENTRY(START)
+ENTRY(start)
 SECTIONS
 {
 	. = 0x100000;

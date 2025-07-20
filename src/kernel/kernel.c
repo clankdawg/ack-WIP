@@ -2,6 +2,7 @@
 #include "../gdt/gdt.h"
 #include "../timer/timer.h"
 #include "../interrupts/idt.h"
+#include "../keyboard/keyboard.h"
 
 void kmain(void);
 
@@ -14,6 +15,7 @@ void kmain(void)
 	print("IDT initialized.\r\n");
 	initTimer();
 	print("Kernel Loaded!\r\n");
+	initKeyboard();
 
 	__asm__ volatile("sti");
 
