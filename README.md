@@ -7,7 +7,7 @@ ack is an OS project that i made as a hobby OS. It is not intended to be a daily
     # frame buffering for text
 
     I want to add frame buffering for text, as it helps because 0xB8000 direct vga printing doesnt work on my device
-
+    
     # keyboard input
 
         I want keyboard input for a later shell.

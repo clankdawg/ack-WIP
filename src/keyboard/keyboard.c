@@ -3,7 +3,10 @@
 #include "../interrupts/idt.h"
 #include "../stdlib/stdio.h"
 #include "keyboard.h"
+#include "../stdlib/strip.h"
+#include "../stdlib/strcpy.h"
 
+char charachterBuffer[3];
 bool capsOn;
 bool capsLock;
 
@@ -41,82 +44,96 @@ const uint32_t NONE = 0xFFFFFFFF - 30;
 const uint32_t ALTGR = 0xFFFFFFFF - 31;
 const uint32_t NUMLCK = 0xFFFFFFFF - 32;
 
-
 const uint32_t lowercase[128] = {
-UNKNOWN,ESC,'1','2','3','4','5','6','7','8',
-'9','0','-','=','\b','\t','q','w','e','r',
-'t','y','u','i','o','p','[',']','\n',CTRL,
-'a','s','d','f','g','h','j','k','l',';',
-'\'','`',LSHFT,'\\','z','x','c','v','b','n','m',',',
-'.','/',RSHFT,'*',ALT,' ',CAPS,F1,F2,F3,F4,F5,F6,F7,F8,F9,F10,NUMLCK,SCRLCK,HOME,UP,PGUP,'-',LEFT,UNKNOWN,RIGHT,
-'+',END,DOWN,PGDOWN,INS,DEL,UNKNOWN,UNKNOWN,UNKNOWN,F11,F12,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
-UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
-UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
-UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN
-};
+    UNKNOWN, ESC, '1', '2', '3', '4', '5', '6', '7', '8',
+    '9', '0', '-', '=', '\b', '\t', 'q', 'w', 'e', 'r',
+    't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', CTRL,
+    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
+    '\'', '`', LSHFT, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',',
+    '.', '/', RSHFT, '*', ALT, ' ', CAPS, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, NUMLCK, SCRLCK, HOME, UP, PGUP, '-', LEFT, UNKNOWN, RIGHT,
+    '+', END, DOWN, PGDOWN, INS, DEL, UNKNOWN, UNKNOWN, UNKNOWN, F11, F12, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
+    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
+    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
+    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};
 
 const uint32_t uppercase[128] = {
-    UNKNOWN,ESC,'!','@','#','$','%','^','&','*','(',')','_','+','\b','\t','Q','W','E','R',
-'T','Y','U','I','O','P','{','}','\n',CTRL,'A','S','D','F','G','H','J','K','L',':','"','~',LSHFT,'|','Z','X','C',
-'V','B','N','M','<','>','?',RSHFT,'*',ALT,' ',CAPS,F1,F2,F3,F4,F5,F6,F7,F8,F9,F10,NUMLCK,SCRLCK,HOME,UP,PGUP,'-',
-LEFT,UNKNOWN,RIGHT,'+',END,DOWN,PGDOWN,INS,DEL,UNKNOWN,UNKNOWN,UNKNOWN,F11,F12,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
-UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
-UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
-UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN
-};
+    UNKNOWN, ESC, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', '\t', 'Q', 'W', 'E', 'R',
+    'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', CTRL, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', LSHFT, '|', 'Z', 'X', 'C',
+    'V', 'B', 'N', 'M', '<', '>', '?', RSHFT, '*', ALT, ' ', CAPS, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, NUMLCK, SCRLCK, HOME, UP, PGUP, '-',
+    LEFT, UNKNOWN, RIGHT, '+', END, DOWN, PGDOWN, INS, DEL, UNKNOWN, UNKNOWN, UNKNOWN, F11, F12, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
+    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
+    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
+    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};
 
-void keyboardHandler(struct InterruptRegisters *regs){
-    char scanCode = inPortB(0x60) & 0x7F; //What key is pressed
-    char press = inPortB(0x60) & 0x80; //Press down, or released
-
-    switch(scanCode){
-        case 1:
-        case 29:
-        case 56:
-        case 59:
-        case 60:
-        case 61:
-        case 62:
-        case 63:
-        case 64:
-        case 65:
-        case 66:
-        case 67:
-        case 68:
-        case 87:
-        case 88:
-            break;
-        case 42:
-            //shift key
-            if (press == 0){
-                capsOn = true;
-            }else{
-                capsOn = false;
-            }
-            break;
-        case 58:
-            if (!capsLock && press == 0){
-                capsLock = true;
-            }else if (capsLock && press == 0){
-                capsLock = false;
-            }
-            break;
-        default:
-            if (press == 0){
-                if (capsOn || capsLock){
-                    printf("%c", uppercase[scanCode]);
-                }else{
-                    printf("%c", lowercase[scanCode]);
-                }
-            }
-            
+void keyboardHandler(struct InterruptRegisters *regs)
+{
+    uint8_t status = inPortB(0x64);
+    if (!(status & 0x01))
+    {
+        return; // nothing to read
     }
-    
+    char code = inPortB(0x60);
+    char scanCode = code & 0x7F;
+    char press = code & 0x80;
+
+    switch (scanCode)
+    {
+    case 1:
+    case 29:
+    case 56:
+    case 59:
+    case 60:
+    case 61:
+    case 62:
+    case 63:
+    case 64:
+    case 65:
+    case 66:
+    case 67:
+    case 68:
+    case 87:
+    case 88:
+        break;
+    case 42:
+        // shift key
+        if (press == 0)
+        {
+            capsOn = true;
+        }
+        else
+        {
+            capsOn = false;
+        }
+        break;
+    case 58:
+        if (!capsLock && press == 0)
+        {
+            capsLock = true;
+        }
+        else if (capsLock && press == 0)
+        {
+            capsLock = false;
+        }
+        break;
+    default:
+        if (press == 0 && scanCode < 128)
+        {
+            if (capsOn || capsLock)
+            {
+                charachterBuffer[0] = (char)uppercase[scanCode];
+            }
+            else
+            {
+                charachterBuffer[0] = (char)lowercase[scanCode];
+            }
+            putc(charachterBuffer[0]);
+        }
+    }
 }
 
-void initKeyboard(){
+void initKeyboard()
+{
     capsOn = false;
     capsLock = false;
-    irq_install_handler(1,&keyboardHandler);
+    irq_install_handler(1, &keyboardHandler);
 }
-

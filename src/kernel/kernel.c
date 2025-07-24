@@ -3,6 +3,7 @@
 #include "../timer/timer.h"
 #include "../interrupts/idt.h"
 #include "../keyboard/keyboard.h"
+#include "../stdlib/stdio.h"
 
 void kmain(void);
 

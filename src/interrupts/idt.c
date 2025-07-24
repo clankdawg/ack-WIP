@@ -132,8 +132,7 @@ void isr_handlers(struct InterruptRegisters *regs)
         print(exception_messages[regs->int_no]);
         print("\n");
         print("Exception! System cannot continue.\n");
-        for (;;)
-            ;
+        for (;;);
     }
 }
 
