@@ -10,7 +10,7 @@ char charachterBuffer[3];
 bool capsOn;
 bool capsLock;
 
-const uint32_t UNKNOWN = 0xFFFFFFFF;
+const uint32_t UNKNOWN = 0xFFFFFFFF; // key codes
 const uint32_t ESC = 0xFFFFFFFF - 1;
 const uint32_t CTRL = 0xFFFFFFFF - 2;
 const uint32_t LSHFT = 0xFFFFFFFF - 3;
@@ -54,7 +54,7 @@ const uint32_t lowercase[128] = {
     '+', END, DOWN, PGDOWN, INS, DEL, UNKNOWN, UNKNOWN, UNKNOWN, F11, F12, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
     UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
     UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
-    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};
+    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN}; // key codes for lowercase characters
 
 const uint32_t uppercase[128] = {
     UNKNOWN, ESC, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', '\t', 'Q', 'W', 'E', 'R',
@@ -63,21 +63,21 @@ const uint32_t uppercase[128] = {
     LEFT, UNKNOWN, RIGHT, '+', END, DOWN, PGDOWN, INS, DEL, UNKNOWN, UNKNOWN, UNKNOWN, F11, F12, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
     UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
     UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
-    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};
+    UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN}; // key codes for uppercase characters
 
 void keyboardHandler(struct InterruptRegisters *regs)
 {
-    uint8_t status = inPortB(0x64);
+    uint8_t status = inPortB(0x64); // read keyboard status register
     if (!(status & 0x01))
     {
         return; // nothing to read
     }
-    char code = inPortB(0x60);
+    char code = inPortB(0x60); // read more data from the keyboard data port
     char scanCode = code & 0x7F;
     char press = code & 0x80;
 
     switch (scanCode)
-    {
+    { // unused keys right now, so we skip them
     case 1:
     case 29:
     case 56:
@@ -106,6 +106,7 @@ void keyboardHandler(struct InterruptRegisters *regs)
         }
         break;
     case 58:
+        // caps lock key
         if (!capsLock && press == 0)
         {
             capsLock = true;
@@ -120,13 +121,13 @@ void keyboardHandler(struct InterruptRegisters *regs)
         {
             if (capsOn || capsLock)
             {
-                charachterBuffer[0] = (char)uppercase[scanCode];
+                charachterBuffer[0] = (char)uppercase[scanCode]; // easier to have a buffer incase of tabs, which i think are 4 bytes
             }
             else
             {
                 charachterBuffer[0] = (char)lowercase[scanCode];
             }
-            putc(charachterBuffer[0]);
+            putc(charachterBuffer[0]); // print the character to the screen
         }
     }
 }
@@ -135,5 +136,5 @@ void initKeyboard()
 {
     capsOn = false;
     capsLock = false;
-    irq_install_handler(1, &keyboardHandler);
+    irq_install_handler(1, &keyboardHandler); // pass our keyboardHandler to the IRQ handler for keyboard interrupts
 }

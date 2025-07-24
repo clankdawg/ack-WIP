@@ -31,6 +31,8 @@ idt_flush:
         JMP irq_common_stub
 %endmacro
 
+;...more setup dear god
+
 ISR_NOERRCODE 0
 ISR_NOERRCODE 1
 ISR_NOERRCODE 2

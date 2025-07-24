@@ -1,10 +1,10 @@
 #include "../stdint/stdint.h"
 
 void *memset(void *dest, char val, uint32_t count);
-void outPortB(uint16_t port, uint8_t value);
-char inPortB(uint16_t port);
+void outPortB(uint16_t port, uint8_t value); // write byte to CPU port
+char inPortB(uint16_t port);                 // read byte from CPU port
 
-struct InterruptRegisters
+struct InterruptRegisters // structure for hardware interrupts
 {
     uint32_t cr2;
     uint32_t ds;

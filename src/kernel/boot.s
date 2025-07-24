@@ -7,7 +7,7 @@ section .text
 	DD -(0x1BADB002 + 0x00000000)
 
 global start 
-extern kmain
+extern kmain ; call our kernel
 
 start:
 	CLI

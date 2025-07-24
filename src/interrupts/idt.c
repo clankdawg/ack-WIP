@@ -16,6 +16,7 @@ void initIdt()
     memset(&idt_entries, 0, sizeof(struct idt_entry_struct) * 256);
     // 0x20 commands 0x21 data
     // 0xA0 commands 0xA1 data
+    // send a ton of data to the cpu ports to initialize the IDT
     outPortB(0x20, 0x11);
     outPortB(0xA0, 0x11);
     outPortB(0x21, 0x20);
@@ -76,13 +77,13 @@ void initIdt()
     setIdtGate(45, (uint32_t)irq13, 0x08, 0x08E);
     setIdtGate(46, (uint32_t)irq14, 0x08, 0x08E);
     setIdtGate(47, (uint32_t)irq15, 0x08, 0x08E);
-
+    // this sets the system calls and the actual interrupt calls
     setIdtGate(128, (uint32_t)isr128, 0x08, 0x8E); // System Calls
     setIdtGate(177, (uint32_t)isr177, 0x08, 0x8E); // System Calls
 
     idt_flush((uint32_t)&idt_ptr);
 }
-void setIdtGate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)
+void setIdtGate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) // set an IDT gate
 {
     idt_entries[num].base_low = base & 0xFFFF;
     idt_entries[num].base_high = (base >> 16) & 0xFFFF;
@@ -91,7 +92,7 @@ void setIdtGate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)
     idt_entries[num].flags = flags | 0x60;
 }
 
-const char *exception_messages[] = {
+const char *exception_messages[] = { // exception messages for the first 32 interrupts
     "Division By Zero",
     "Debug",
     "Non Maskable Interrupt",
@@ -126,31 +127,32 @@ const char *exception_messages[] = {
     "Reserved"};
 
 void isr_handlers(struct InterruptRegisters *regs)
-{
+{ // handle the interrupts
     if (regs->int_no < 32)
     {
         print(exception_messages[regs->int_no]);
         print("\n");
         print("Exception! System cannot continue.\n");
-        for (;;);
+        for (;;)
+            ;
     }
 }
 
-void *irq_routines[16] = {
+void *irq_routines[16] = { // array of IRQ handlers
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0};
 
-void irq_install_handler(int irq, void (*handler)(struct InterruptRegisters *regs))
+void irq_install_handler(int irq, void (*handler)(struct InterruptRegisters *regs)) // install an IRQ handler
 {
     irq_routines[irq] = handler;
 }
 
-void irq_uninstall_handler(int irq)
+void irq_uninstall_handler(int irq) // uninstall an IRQ handler
 {
     irq_routines[irq] = 0;
 }
 
-void irq_handler(struct InterruptRegisters *regs)
+void irq_handler(struct InterruptRegisters *regs) // handle the IRQs
 {
     void (*handler)(struct InterruptRegisters *regs);
 

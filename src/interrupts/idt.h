@@ -1,7 +1,7 @@
 #include "../stdint/stdint.h"
 #include "../vga_utils/util.h"
 
-struct idt_entry_struct
+struct idt_entry_struct // structure for IDT entries
 {
     uint16_t base_low;
     uint16_t sel;
@@ -10,7 +10,7 @@ struct idt_entry_struct
     uint16_t base_high;
 } __attribute__((packed));
 
-struct idt_ptr_struct
+struct idt_ptr_struct // structure for IDT pointer
 {
     uint16_t limit;
     uint32_t base;
@@ -22,6 +22,8 @@ void setIdtGate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
 void isr_handlers(struct InterruptRegisters *regs);
 
 void irq_install_handler(int irq, void (*handler)(struct InterruptRegisters *regs));
+
+//...more function declarations
 
 extern void isr0();
 extern void isr1();

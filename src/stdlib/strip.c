@@ -1,6 +1,6 @@
 #include "strip.h"
 
-void strip_char(char *strip, int num, char until_char)
+void strip_char(char *strip, int num, char until_char) // strips the string by replacing the character at the specified index with a null terminator.
 {
     int i = 0;
     int until_index = -1;

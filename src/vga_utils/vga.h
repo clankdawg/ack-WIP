@@ -1,6 +1,6 @@
 #pragma once
 
-
+// Setup VGA color
 #define COLOR8_BLACK 0
 #define COLOR8_BLUE 1
 #define COLOR8_GREEN 2
@@ -18,10 +18,11 @@
 #define COLOR8_LIGHT_BROWN 14
 #define COLOR8_WHITE 15
 
+// VGA buffer/resolution
 #define width 80
 #define height 25
 
-void print(const char* s);
+void print(const char *s);
 void scrollUp();
 void newLine();
 void Reset();

@@ -2,6 +2,14 @@
 
 ack is an OS project that i made as a hobby OS. It is not intended to be a daily driver, just a cool little project i made.
 
+# How to use
+
+If you have make installed, run make in the directory with the Makefile
+
+# Regarding documentation
+
+I know, very little, i have tried to comment some things, but when it comes to OS development, you kind of have to deal with magic numbers flying around all over the place, please, try to understand where im coming from here.
+
 # What i want to do:
 
     # frame buffering for text

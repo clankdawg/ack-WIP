@@ -1,6 +1,7 @@
 #include "../stdint/stdint.h"
-#include "../vga_utils/util.h"
+#include "../vga_utils/util.h" // hardware io and interrupt register struct
 
+// gdt entry describes a segment for x86 memory protection
 struct gdt_entry_struct
 {
 	uint16_t limit;
@@ -11,6 +12,7 @@ struct gdt_entry_struct
 	uint8_t base_high;
 } __attribute__((packed));
 
+// tss entry is for hardware task switching (rarely used on modern os)
 struct tss_entry_struct
 {
 	uint32_t prev_tss;
@@ -42,6 +44,7 @@ struct tss_entry_struct
 	uint32_t iomap_base;
 } __attribute__((packed));
 
+// gdt pointer struct for lgdt instruction (hardware loads this)
 struct gdt_ptr_struct
 {
 	uint16_t limit;

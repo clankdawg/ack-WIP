@@ -1,11 +1,10 @@
 void putc(char c);
-void puts(const char* str);
-void printf(const char* fmt, ...);
-int * printf_number(int*, int, bool, int);
+void puts(const char *str);
+void printf(const char *fmt, ...);
+int *printf_number(int *, int, bool, int);
 
-extern void x86_div64_32(uint64_t, uint32_t, uint64_t*, uint32_t*);
-
-#define PRINTF_STATE_START 0
+extern void x86_div64_32(uint64_t, uint32_t, uint64_t *, uint32_t *); // 64 bit integer division and stores the quotient and remainder in the provided pointers
+#define PRINTF_STATE_START 0                                          // length and state constants for printf
 #define PRINTF_STATE_LENGTH 1
 #define PRINTF_STATE_SHORT 2
 #define PRINTF_STATE_LONG 3

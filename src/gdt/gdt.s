@@ -14,7 +14,7 @@ gdt_flush:
 .flush:
     RET
 
-global tss_flush
+global tss_flush ; setup for TSS and GDT
 
 tss_flush:
     MOV ax, 0x2B
