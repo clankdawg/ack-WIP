@@ -1,5 +1,0 @@
-# Ignore VS Code and GitHub config directories
-.vscode/
-.github/
-./.vscode/*
-./.github/*
