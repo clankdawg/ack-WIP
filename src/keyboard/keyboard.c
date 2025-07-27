@@ -6,7 +6,7 @@
 #include "../stdlib/strip.h"
 #include "../stdlib/strcpy.h"
 
-char charachterBuffer[3];
+char charBuffer[1];
 bool capsOn;
 bool capsLock;
 
@@ -127,7 +127,7 @@ void keyboardHandler(struct InterruptRegisters *regs)
             {
                 charachterBuffer[0] = (char)lowercase[scanCode];
             }
-            printf("%c", charachterBuffer[0]); // print the character to the screen
+            printf("%c", charBuffer[0]); // print the character to the screen
         }
     }
 }
