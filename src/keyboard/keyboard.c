@@ -127,7 +127,7 @@ void keyboardHandler(struct InterruptRegisters *regs)
             {
                 charachterBuffer[0] = (char)lowercase[scanCode];
             }
-            putc(charachterBuffer[0]); // print the character to the screen
+            printf("%c", charachterBuffer[0]); // print the character to the screen
         }
     }
 }

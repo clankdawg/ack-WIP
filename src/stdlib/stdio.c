@@ -3,12 +3,13 @@
 #include "../vga_utils/vga.h"
 
 void putc(char c)
-{ // print a single character to the screen
-    print(&c);
+{
+    char str[2] = {c, '\0'};
+    print(str);
 }
 
 void puts(const char *s)
-{ // print a string
+{
     while (*s)
     {
         putc(*s);
@@ -17,211 +18,138 @@ void puts(const char *s)
 }
 
 void printf(const char *fmt, ...)
-{ // this function is currently broken, it breaks on %s, %c, %d etc, working on it
-    int *argp = (int *)&fmt;
-    int state = PRINTF_STATE_START;
-    int length = PRINTF_LENGTH_START;
-    int radix = 10;
-    bool sign = false;
+{
+    uint32_t *args = (uint32_t *)((char *)&fmt + sizeof(fmt));
+    int arg_index = 0;
 
-    argp++;
     while (*fmt)
     {
-        switch (state)
+        if (*fmt == '%' && *(fmt + 1))
         {
-        case PRINTF_STATE_START:
-            if (*fmt == '%')
-            {
-                state = PRINTF_STATE_LENGTH;
-            }
-            else
-            {
-                putc(*fmt);
-            }
-            break;
-        case PRINTF_STATE_LENGTH:
-            if (*fmt == 'h')
-            {
-                length = PRINTF_LENGTH_SHORT;
-                state = PRINTF_STATE_SHORT;
-            }
-            else if (*fmt == 'l')
-            {
-                length = PRINTF_LENGTH_LONG;
-                state = PRINTF_STATE_LONG;
-            }
-            else
-            {
-                goto PRINTF_STATE_SPEC_;
-            }
-            break;
-            // hd
-        case PRINTF_STATE_SHORT:
-            if (*fmt == 'h')
-            {
-                length = PRINTF_LENGTH_SHORT_SHORT;
-                state = PRINTF_STATE_SPEC;
-            }
-            else
-            {
-                goto PRINTF_STATE_SPEC_;
-            }
-            break;
+            fmt++;
 
-        case PRINTF_STATE_LONG:
-            if (*fmt == 'l')
-            {
-                length = PRINTF_LENGTH_LONG_LONG;
-                state = PRINTF_STATE_SPEC;
-            }
-            else
-            {
-                goto PRINTF_STATE_SPEC_;
-            }
-            break;
-
-        case PRINTF_STATE_SPEC:
-        PRINTF_STATE_SPEC_:
             switch (*fmt)
             {
             case 'c':
-                putc((char)*argp);
-                argp++;
+            {
+                char c = (char)args[arg_index++];
+                putc(c);
                 break;
+            }
             case 's':
-                if (length == PRINTF_LENGTH_LONG || length == PRINTF_LENGTH_LONG_LONG)
+            {
+                const char *str = (const char *)args[arg_index++];
+                if (str)
                 {
-                    puts(*(const char **)argp);
-                    argp += 2;
+                    puts(str);
                 }
                 else
                 {
-                    puts(*(const char **)argp);
-                    argp++;
+                    puts("(null)");
                 }
                 break;
-            case '%':
-                putc('%');
-                break;
+            }
             case 'd':
             case 'i':
-                radix = 10;
-                sign = true;
-                argp = printf_number(argp, length, sign, radix);
-                break;
-            case 'u':
-                radix = 10;
-                sign = false;
-                argp = printf_number(argp, length, sign, radix);
-                break;
-            case 'X':
-            case 'x':
-            case 'p':
-                radix = 16;
-                sign = false;
-                argp = printf_number(argp, length, sign, radix);
-                break;
-            case 'o':
-                radix = 8;
-                sign = false;
-                argp = printf_number(argp, length, sign, radix);
-                break;
-            default:
+            {
+                int num = (int)args[arg_index++];
+                printf_number_simple(num, 10, true);
                 break;
             }
-            state = PRINTF_STATE_START;
-            length = PRINTF_LENGTH_START;
-            radix = 10;
-            sign = false;
-            break;
+            case 'u':
+            {
+                uint32_t num = args[arg_index++];
+                printf_number_simple(num, 10, false);
+                break;
+            }
+            case 'x':
+            {
+                uint32_t num = args[arg_index++];
+                printf_number_simple(num, 16, false);
+                break;
+            }
+            case 'X':
+            {
+                uint32_t num = args[arg_index++];
+                printf_number_simple_upper(num, 16, false);
+                break;
+            }
+            case '%':
+            {
+                putc('%');
+                break;
+            }
+            default:
+            {
+                putc('%');
+                putc(*fmt);
+                break;
+            }
+            }
+        }
+        else
+        {
+            putc(*fmt);
         }
         fmt++;
     }
 }
-
-const char possibleChars[] = "0123456789abcdef";
-
-int *printf_number(int *argp, int length, bool sign, int radix) // // prints a signed or unsigned integer argument in the specified base (radix) and advances the argument pointer
+void printf_number_simple(uint32_t num, int base, bool is_signed)
 {
-    char buffer[32] = "";
-    uint32_t number;
-    int number_sign = 1;
+    if (is_signed && (int32_t)num < 0)
+    {
+        putc('-');
+        num = -(int32_t)num;
+    }
+
+    if (num == 0)
+    {
+        putc('0');
+        return;
+    }
+
+    char buffer[32];
     int pos = 0;
+    const char digits[] = "0123456789abcdef";
 
-    switch (length)
+    while (num > 0)
     {
-    case PRINTF_LENGTH_SHORT_SHORT:
-    case PRINTF_LENGTH_SHORT:
-    case PRINTF_LENGTH_START:
-        if (sign)
-        {
-            int n = *argp;
-            if (n < 0)
-            {
-                n = -n;
-                number_sign = -1;
-            }
-            number = (uint32_t)n;
-        }
-        else
-        {
-            number = *(uint32_t *)argp;
-        }
-        argp++;
-        break;
-    case PRINTF_LENGTH_LONG:
-        if (sign)
-        {
-            long int n = *(long int *)argp;
-            if (n < 0)
-            {
-                n = -n;
-                number_sign = -1;
-            }
-            number = (uint32_t)n;
-        }
-        else
-        {
-            number = *(uint32_t *)argp;
-        }
-        argp += 2;
-        break;
-    case PRINTF_LENGTH_LONG_LONG:
-        if (sign)
-        {
-            long long int n = *(long long int *)argp;
-            if (n < 0)
-            {
-                n = -n;
-                number_sign = -1;
-            }
-            number = (uint32_t)n;
-        }
-        else
-        {
-            number = *(uint32_t *)argp;
-        }
-        argp += 4;
-        break;
+        buffer[pos++] = digits[num % base];
+        num /= base;
     }
 
-    do
+    for (int i = pos - 1; i >= 0; i--)
     {
-        uint32_t rem = number % radix;
-        number = number / radix;
+        putc(buffer[i]);
+    }
+}
 
-        buffer[pos++] = possibleChars[rem];
-    } while (number > 0);
-
-    if (sign && number_sign < 0)
+void printf_number_simple_upper(uint32_t num, int base, bool is_signed)
+{
+    if (is_signed && (int32_t)num < 0)
     {
-        buffer[pos++] = '-';
+        putc('-');
+        num = -(int32_t)num;
     }
 
-    while (--pos >= 0)
+    if (num == 0)
     {
-        putc(buffer[pos]);
+        putc('0');
+        return;
     }
 
-    return argp;
+    char buffer[32];
+    int pos = 0;
+    const char digits[] = "0123456789ABCDEF";
+
+    while (num > 0)
+    {
+        buffer[pos++] = digits[num % base];
+        num /= base;
+    }
+
+    for (int i = pos - 1; i >= 0; i--)
+    {
+        putc(buffer[i]);
+    }
 }

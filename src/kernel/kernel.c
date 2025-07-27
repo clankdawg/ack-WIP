@@ -5,6 +5,8 @@
 #include "../keyboard/keyboard.h"
 #include "../stdlib/stdio.h"
 
+char test[] = "Hello, World!\r\n";
+
 void kmain(void);
 
 void kmain(void)
@@ -17,6 +19,9 @@ void kmain(void)
 	initTimer();
 	print("Kernel Loaded!\r\n");
 	initKeyboard(); // initialize everything
+
+	printf("Hello %s! Number: %d, Hex: 0x%x\n", "World", 42, 255);
+	printf("Character: %c, Percent: %%\n", 'A');
 
 	__asm__ volatile("sti"); // then call assembly instruction to enable interrupts
 
