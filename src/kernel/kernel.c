@@ -4,12 +4,15 @@
 #include "../interrupts/idt.h"
 #include "../keyboard/keyboard.h"
 #include "../stdlib/stdio.h"
+#include "../stdint/stdint.h"
+#include "../bootconfig/memory.h"
+#include "../bootconfig/multiboot.h"
 
 char test[] = "Hello, World!\r\n";
 
-void kmain(void);
+void kmain(uint32_t magic, struct multiboot_info* bootInfo);
 
-void kmain(void)
+void kmain(uint32_t magic, struct multiboot_info* bootInfo)
 {
 	Reset();
 	initGdt();
@@ -18,10 +21,9 @@ void kmain(void)
 	print("IDT initialized.\r\n");
 	initTimer();
 	print("Kernel Loaded!\r\n");
-	initKeyboard(); // initialize everything
-
-	printf("Hello %s! Number: %d, Hex: 0x%x\n", "World", 42, 255);
-	printf("Character: %c, Percent: %%\n", 'A');
+	initKeyboard();		  // initialize everything
+	initMemory(bootInfo); // initialize memory management
+	print("\nMemory initialized.\r\n");
 
 	__asm__ volatile("sti"); // then call assembly instruction to enable interrupts
 
