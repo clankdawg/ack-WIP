@@ -121,11 +121,11 @@ void keyboardHandler(struct InterruptRegisters *regs)
         {
             if (capsOn || capsLock)
             {
-                charachterBuffer[0] = (char)uppercase[scanCode]; // easier to have a buffer incase of tabs, which i think are 4 bytes
+                charBuffer[0] = (char)uppercase[scanCode]; // easier to have a buffer incase of tabs, which i think are 4 bytes
             }
             else
             {
-                charachterBuffer[0] = (char)lowercase[scanCode];
+                charBuffer[0] = (char)lowercase[scanCode];
             }
             printf("%c", charBuffer[0]); // print the character to the screen
         }

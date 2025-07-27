@@ -1,5 +1,5 @@
 gcc = /usr/opt/cross/bin/i686-elf-gcc
-CFLAGS = -ffreestanding -Wall -Wextra -g -O2
+CFLAGS = -ffreestanding -Wall -Wextra -g -O3
 SFLAGS = -f elf32
 
 all: clean kernel boot image
