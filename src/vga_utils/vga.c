@@ -3,7 +3,7 @@
 
 uint16_t column = 0;                                                           // setup text column (x coordinate)
 uint16_t line = 0;                                                             // setup correct line (y coordinate)
-uint16_t *const vga = (uint16_t *const)0xB8000;                                // VGA buffer memory address
+uint16_t *const vga = (uint16_t *const)0xC00B8000;                                // VGA buffer memory address
 const uint16_t defaultColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12); // setting colors
 uint16_t currentColor = defaultColor;                                          // setting current color
 

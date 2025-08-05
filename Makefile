@@ -18,14 +18,14 @@ kernel:
 	$(gcc) $(CFLAGS) -c src/stdlib/stdio.c -o src/stdlib/stdio.o
 	$(gcc) $(CFLAGS) -c src/stdlib/strcpy.c -o src/stdlib/strcpy.o
 	$(gcc) $(CFLAGS) -c src/stdlib/strip.c -o src/stdlib/strip.o
-	$(gcc) $(CFLAGS) -c src/bootconfig/memory.c -o src/bootconfig/memory.o
+	$(gcc) $(CFLAGS) -c src/memory/memory.c -o src/memory/memory.o
 boot:
 	nasm $(SFLAGS) src/kernel/boot.s -o src/kernel/boot.o
 	nasm $(SFLAGS) src/gdt/gdt.s -o src/gdt/gdts.o
 	nasm $(SFLAGS) src/interrupts/idt.s -o src/interrupts/idts.o
 
 image:
-	ld -m elf_i386 -T linker.ld -o kernel src/kernel/boot.o src/kernel/kernel.o src/vga_utils/vga.o src/gdt/gdt.o src/gdt/gdts.o src/vga_utils/util.o src/interrupts/idt.o src/interrupts/idts.o src/timer/timer.o src/keyboard/keyboard.o src/stdlib/stdio.o src/stdlib/strcpy.o src/stdlib/strip.o src/bootconfig/memory.o
+	ld -m elf_i386 -T linker.ld -o kernel src/kernel/boot.o src/kernel/kernel.o src/vga_utils/vga.o src/gdt/gdt.o src/gdt/gdts.o src/vga_utils/util.o src/interrupts/idt.o src/interrupts/idts.o src/timer/timer.o src/keyboard/keyboard.o src/stdlib/stdio.o src/stdlib/strcpy.o src/stdlib/strip.o src/memory/memory.o
 	mv kernel src/boot/kernel
 	grub-mkrescue -o kernel.iso src/
 	rm src/*/*.o

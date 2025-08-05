@@ -4,6 +4,8 @@ void *memset(void *dest, char val, uint32_t count);
 void outPortB(uint16_t port, uint8_t value); // write byte to CPU port
 char inPortB(uint16_t port);                 // read byte from CPU port
 
+#define CEIL_DIV(a,b) (((a + b) - 1)/b) // calculate ceiling division
+
 struct InterruptRegisters // structure for hardware interrupts
 {
     uint32_t cr2;
